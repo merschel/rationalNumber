@@ -50,3 +50,9 @@ For the sign of the rational number use
 
 R.get_sign();  // true == negativ number, false == positiv number
 
+With 
+
+R.to_string(); 
+
+you will get a string of the rational number.
+
