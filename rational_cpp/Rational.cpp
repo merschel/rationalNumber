@@ -122,7 +122,7 @@ Rational Rational::pow(int n){
 		a.set(pow(get_numerator(), n), pow(get_denominator(), n));
 	}
 	else if (n < 0) {
-		a.set(pow(get_denominator(), n), pow(get_numerator(), n));
+		a.set(pow(get_denominator(), -n), pow(get_numerator(), -n));
 	}
 	else { // if n == 0
 		a.set(1UL, 1UL);
