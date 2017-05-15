@@ -138,18 +138,70 @@ Rational Rational::inv(){
 	return a;
 }
 
-		
-/*Rational operator+(Rational a,Rational b);
-Rational operator-(Rational a,Rational b);
-Rational operator*(Rational a,Rational b);
-Rational operator/(Rational a,Rational b);
+bool Rational::equal(Rational r) {
+	// shoort the number first
+	return this->identical(r);
+}
+
+bool Rational::identical(Rational r) {
+	return numerator == r.get_numerator() && denominator == r.get_denominator();
+}
+
+bool Rational::lessThan(Rational r) {
+	return (sign || !r.get_sign()) && !(sign == r.get_sign() == (numerator * r.get_denominator() < r.get_numerator() * denominator));
+}
+
+bool Rational::greaterThan(Rational r) {
+	return (!sign || r.get_sign()) && !(sign == r.get_sign() == (numerator * r.get_denominator() < r.get_numerator() * denominator));
+}
+
+bool Rational::lessThanOrEqual(Rational r) {
+	return !this->greaterThan(r);
+}
+
+bool Rational::greaterThanOrEqual(Rational r) {
+	return !this->lessThan(r);
+}
+
+Rational Rational::operator+(Rational r) {
+	return this->add(r);
+}
+
+Rational Rational::operator-(Rational r) {
+	return this->sub(r);
+}
+
+Rational Rational::operator*(Rational r) {
+	return this->mul(r);
+}
+
+Rational Rational::operator/(Rational r) {
+	return this->div(r);
+}
 	
-Rational operator==(Rational a,Rational b);
-Rational operator!=(Rational a,Rational b);
-Rational operator<=(Rational a,Rational b);
-Rational operator>=(Rational a,Rational b);
-Rational operator<(Rational a,Rational b);
-Rational operator>(Rational a,Rational b);*/
+bool Rational::operator==(Rational r) {
+	return this->equal(r);
+}
+
+bool Rational::operator!=(Rational r) {
+	return !(this->equal(r));
+}
+
+bool Rational::operator<(Rational r) {
+	return this->lessThan(r);
+}
+
+bool Rational::operator>(Rational r) {
+	return this->greaterThan(r);
+}
+
+bool Rational::operator<=(Rational r) {
+	return this->lessThanOrEqual(r);
+}
+
+bool Rational::operator>=(Rational r) {
+	return this->greaterThanOrEqual(r);
+}
 
 long Rational::gcd(){
 	return 1L;
@@ -182,4 +234,14 @@ unsigned long Rational::pow(const unsigned long b, const unsigned int n){
 		return p2*p2*b;
 	else
 		return p2*p2;
+}
+
+long Rational::sgn(long a) {
+	if (a < 0) {
+		return -1;
+	}
+	else {
+		return 1;
+	}
+
 }

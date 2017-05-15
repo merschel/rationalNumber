@@ -13,12 +13,11 @@ int main(int argc, char** argv) {
 	b.set(-4, 9);
 	std::cout << b.to_string() << std::endl;
 
-	c = a.pow(-1); // fehler
+	c = a + b;
 	std::cout << c.to_string() << std::endl;
 
-	Rational d = b.pow(3);
-	std::cout << d.to_string() << std::endl;
-	
+	std::cout << a.lessThan(b) << std::endl;
+
 	std::cout << std::endl;
 	std::cout << std::endl;
 	std::cout << std::endl;
