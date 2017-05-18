@@ -4,25 +4,27 @@
 
 Rational::Rational(){
 	set(0UL,1UL);
-	set_reduce(true);
 	set_sign(false);
 }
 
 Rational::Rational(const int _numerator,const int _denominator) {
-	set(_numerator, _denominator);  // go to the int version and than to the long
+	set_sign(xor (_numerator < 0, _denominator < 0));
+	set(static_cast<unsigned long>(abs(_numerator)), static_cast<unsigned long>(abs(_denominator)));  
 }
 
 Rational::Rational(const long _numerator,const long _denominator) {
-	set(_numerator, _denominator); // the long version
+	set_sign(xor (_numerator < 0, _denominator < 0));
+	set(static_cast<unsigned long>(abs(_numerator)), static_cast<unsigned long>(abs(_denominator))); 
 }
 
 void Rational::set(const int _numerator, const int _denominator) {
-	set(static_cast<long>(_numerator), static_cast<long>(_denominator)); // just go to the long setter
+	set_sign(xor (_numerator < 0, _denominator < 0));
+	set(static_cast<unsigned long>(abs(_numerator)), static_cast<unsigned long>(abs(_denominator))); 
 }
 
 void Rational::set(const long _numerator, const long _denominator) {
 	set_sign(xor (_numerator < 0, _denominator < 0));
-	set(abs(_numerator), abs(_denominator));
+	set(static_cast<unsigned long>(abs(_numerator)), static_cast<unsigned long>(abs(_denominator)));
 }
 
 void Rational::set(const unsigned long _numerator, const unsigned long _denominator) {
@@ -34,14 +36,15 @@ void Rational::set(const unsigned long _numerator, const unsigned long _denomina
 		numerator = 0UL;
 		denominator = 1UL;
 	}
+	cancelDown();
 }
 
-void Rational::set_reduce(const bool _reduce) {
-	reduce = _reduce;
+void Rational::set_cancel(const bool _cancel) {
+	cancel = _cancel;
 }
 
-void Rational::set_sign(const bool _sign) {
-	sign = _sign;
+void Rational::set_sign(const bool _sign) { 
+	sign = _sign;  // true == negative, false == positive
 }
 
 unsigned long Rational::get_numerator() {
@@ -56,9 +59,13 @@ bool Rational::get_sign() {
 	return sign;
 }
 
+bool Rational::get_cancel() {
+	return cancel;
+}
+
 Rational Rational::add(Rational r){
 	Rational a;
-
+	a.set_cancel(false);
 	unsigned long _y = r.get_denominator() * numerator;
 	unsigned long _x = r.get_numerator() * denominator;
 	if ( sign && r.get_sign() ) { // addition of 2 negativ Rationals
@@ -91,6 +98,7 @@ Rational Rational::add(Rational r){
 
 Rational Rational::sub(Rational r){
 	Rational a;
+	a.set_cancel(false);
 	r.set_sign(xor(true,r.get_sign()));
 	a = this->add(r);
 	return a;
@@ -98,6 +106,7 @@ Rational Rational::sub(Rational r){
 
 Rational Rational::mul(Rational r){
 	Rational a;
+	a.set_cancel(false);
 	a.set_sign( xor(sign, r.get_sign()) );
 	a.set(r.get_numerator() * numerator, r.get_denominator() * denominator);
 	return a;
@@ -105,12 +114,14 @@ Rational Rational::mul(Rational r){
 
 Rational Rational::div(Rational r){
 	Rational a;
+	a.set_cancel(false);
 	a = this->mul(r.inv());
 	return a;
 }
 
 Rational Rational::pow(int n){
 	Rational a;
+	a.set_cancel(false);
 	if (n % 2 == 0) {
 		a.set_sign(false);
 	}
@@ -127,20 +138,24 @@ Rational Rational::pow(int n){
 	else { // if n == 0
 		a.set(1UL, 1UL);
 	}
-
 	return a;
 }
 
 Rational Rational::inv(){
 	Rational a;
+	a.set_cancel(false);
 	a.set_sign(get_sign());
 	a.set(get_denominator(), get_numerator());
 	return a;
 }
 
 bool Rational::equal(Rational r) {
-	// shoort the number first
-	return this->identical(r);
+	Rational a(*this);
+	a.set_cancel(true);
+	r.set_cancel(true);
+	a.cancelDown();
+	r.cancelDown();
+	return a.identical(r);
 }
 
 bool Rational::identical(Rational r) {
@@ -203,8 +218,32 @@ bool Rational::operator>=(Rational r) {
 	return this->greaterThanOrEqual(r);
 }
 
-long Rational::gcd(){
-	return 1L;
+Rational Rational::operator=(Rational r) {  // this is not working
+	numerator = r.get_numerator();
+	denominator = r.get_denominator();
+	sign = r.get_sign();
+	if (cancel) {
+		cancelDown();
+	}
+	return *this;
+}
+
+void Rational::cancelDown() {
+	if (cancel) {
+		unsigned long h = gcd(numerator, denominator);
+		numerator /= h;
+		denominator /= h;
+	}
+}
+
+unsigned long Rational::gcd(unsigned long a,unsigned long b){
+	unsigned long h = 0UL;
+	while (b != 0UL) {
+		h = a % b;
+		a = b;
+		b = h;
+	}
+	return a;
 }
 
 std::string Rational::to_string(){
@@ -212,6 +251,14 @@ std::string Rational::to_string(){
 	ss << ( (sign) ? "-" : "" );
 	ss << numerator << " // " << denominator;
 	return ss.str();
+}
+
+float Rational::to_float() {
+	return static_cast<float>(to_double());
+}
+
+double Rational::to_double() {
+	return 1.0 * (get_sign() ? -1 : 1 ) * get_numerator() / get_denominator();
 }
 
 bool Rational::xor(const bool p, const bool q){
@@ -234,14 +281,4 @@ unsigned long Rational::pow(const unsigned long b, const unsigned int n){
 		return p2*p2*b;
 	else
 		return p2*p2;
-}
-
-long Rational::sgn(long a) {
-	if (a < 0) {
-		return -1;
-	}
-	else {
-		return 1;
-	}
-
 }

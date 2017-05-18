@@ -4,14 +4,14 @@ class Rational{
 		unsigned long numerator;
 		unsigned long denominator;
 		bool sign;    // false == positive; true == negative
-		bool reduce;
+		bool cancel = true;  // true == default
 		
 		void set(const unsigned long _numerator, const unsigned long _denominator);
-		long gcd();
+		unsigned long Rational::gcd(unsigned long a, unsigned long b);
 		bool xor(const bool p,const bool q);
 		unsigned long Rational::abs(long a);
 		unsigned long Rational::pow(const unsigned long b, const unsigned int n);
-		long Rational::sgn(long a);
+		
 
 	public:
 		Rational();
@@ -20,19 +20,19 @@ class Rational{
 
 		void set(const int _numerator, const int _denominator);
 		void set(const long _numerator, const long _denominator);
-		void set_reduce(const bool _reduce);
+		void set_cancel(const bool _reduce);
 		void set_sign(const bool _sign);
 		
 		unsigned long get_numerator();
 		unsigned long get_denominator();
 		bool get_sign();
+		bool get_cancel();
 		bool equal(Rational r);
 		bool identical(Rational r);
 		bool Rational::lessThan(Rational r);
 		bool Rational::greaterThan(Rational r);
 		bool Rational::lessThanOrEqual(Rational r);
 		bool Rational::greaterThanOrEqual(Rational r);
-
 
 		Rational add( Rational r);
 		Rational sub( Rational r);
@@ -45,15 +45,17 @@ class Rational{
 		Rational operator*(Rational r);
 		Rational operator/(Rational r);
 		
-
 		bool operator==(Rational r);
 		bool operator!=(Rational r);
 		bool operator<=(Rational r);
 		bool operator>=(Rational r);
 		bool operator<(Rational r);
 		bool operator>(Rational r);
-		
+		Rational operator=(Rational r);
+
+		void Rational::cancelDown();
+
 		std::string to_string();
-		
-		
+		float to_float();
+		double to_double();
 };
